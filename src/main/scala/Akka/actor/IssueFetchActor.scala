@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import caliban.client.TypeAliases.IssueInfoList
 import org.slf4j.{Logger, LoggerFactory}
-import queries.{IssueQuery, IssueQuery_copy}
+import queries.{IssueQuery_Object, IssueQuery}
 import zio.{Runtime, Unsafe}
 
 object IssueFetchActor {
@@ -24,16 +24,16 @@ object IssueFetchActor {
 
         Unsafe.unsafe { implicit unsafe =>
           // Running the ZIO effect and converting it to a Future
-          val obj = new IssueQuery_copy()
-          obj.setreponame(repoName)
-          obj.setOwnername(ownerName)
+          val obj = new IssueQuery()
+          obj.setRepoName(repoName)
+          obj.setOwnerName(ownerName)
 //          logger.info(s" before call $ownerName/$repoName")
 //          logger.info(s" before call from issue query ${obj.ownername}/${obj.reponame}")
           val future = runtime.unsafe.runToFuture(obj.run)
 //          logger.info(s" after call $ownerName/$repoName")
           future.onComplete {
             case scala.util.Success(value) =>
-              val reply: Option[List[Option[Option[Option[IssueInfoList]]]]] = value
+              val reply: Option[Option[List[Option[IssueInfoList]]]] = value
               logger.info(s"Issues successfully fetched for $repoName: ${reply.toString}")
               replyTo ! RootActor.IssueFetchActorReply(value.toString)
             case scala.util.Failure(exception) =>

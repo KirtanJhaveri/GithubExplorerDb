@@ -27,7 +27,7 @@ object RepoQuery extends ZIOAppDefault {
     val githubOauthToken: String = config.getString("Github.oauthToken")
     val searchLanguage: String = config.getString("Github.search.language")
     val searchFirst: Int = config.getInt("Github.search.first")
-//    type RepoInfoList = (String, Option[Int], Boolean, Boolean, Boolean, Boolean, Option[String], URI)
+
     //Combining the fields to be sent in the query
     val repository: SelectionBuilder[Repository, RepoInfoList] = Repository.name ~ Repository.ownerInterface(owner = RepositoryOwner.login) ~
       Repository.diskUsage ~ Repository.hasIssuesEnabled ~ Repository.isArchived ~ Repository.isDisabled ~ Repository.isEmpty ~
@@ -50,8 +50,7 @@ object RepoQuery extends ZIOAppDefault {
           req.headers(Header("Authorization", s"Bearer $githubOauthToken")).send(backend)
         }
         .mapError { error =>
-          // Print the error message or log it
-          println(s"Error during request: $error")
+          logger.error(s"Error during request: $error")
           error
         }
         .map(_.body)
@@ -64,7 +63,6 @@ object RepoQuery extends ZIOAppDefault {
         .provideLayer(HttpClientZioBackend.layer())
 //        .map(_.toString)
         .tap(response => printLine(s"Response: $response"))
-//        .catchAll(error => ZIO.succeed(error.getMessage)) // Catch any errors and return the error message as String
 
     result
   }

@@ -1,7 +1,7 @@
-import queries.RepoQuery
+package Akka.actor
 
+import queries.RepoQuery
 import zio._
-import zio.internal.Platform
 
 object AnotherObject {
   def main(args: Array[String]): Unit = {

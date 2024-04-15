@@ -1,12 +1,13 @@
 package Akka.actor
 
-import Akka.actor.RootActor.getClass
-import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import caliban.client.TypeAliases.IssueInfoList
 import org.slf4j.{Logger, LoggerFactory}
-import queries.{IssueQuery_Object, IssueQuery}
+import queries.IssueQuery
 import zio.{Runtime, Unsafe}
+
+import scala.concurrent.ExecutionContextExecutor
 
 object IssueFetchActor {
   sealed trait Command
@@ -15,11 +16,11 @@ object IssueFetchActor {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def apply(): Behavior[Command] = Behaviors.setup { context =>
-    implicit val ec = context.executionContext // Use the actor's ExecutionContext for handling Futures
+    implicit val ec: ExecutionContextExecutor = context.executionContext // Use the actor's ExecutionContext for handling Futures
 
     Behaviors.receiveMessage {
       case FetchIssues(repoName, ownerName, replyTo) =>
-        logger.info(s"Fetching issues for $ownerName/$repoName")
+        logger.info(s"Issue Actor spawned for $ownerName/$repoName")
         val runtime = Runtime.default
 
         Unsafe.unsafe { implicit unsafe =>
@@ -28,14 +29,14 @@ object IssueFetchActor {
           obj.setRepoName(repoName)
           obj.setOwnerName(ownerName)
 //          logger.info(s" before call $ownerName/$repoName")
-//          logger.info(s" before call from issue query ${obj.ownername}/${obj.reponame}")
+//          logger.info(s" before call from issue query ${obj.ownerName}/${obj.repoName}")
           val future = runtime.unsafe.runToFuture(obj.run)
 //          logger.info(s" after call $ownerName/$repoName")
           future.onComplete {
             case scala.util.Success(value) =>
               val reply: Option[Option[List[Option[IssueInfoList]]]] = value
               logger.info(s"Issues successfully fetched for $repoName: ${reply.toString}")
-              replyTo ! RootActor.IssueFetchActorReply(value.toString)
+              replyTo ! RootActor.IssueFetchActorReply(value)
             case scala.util.Failure(exception) =>
               logger.error(s"Failed to fetch issues for $repoName: ${exception.getMessage}")
           }

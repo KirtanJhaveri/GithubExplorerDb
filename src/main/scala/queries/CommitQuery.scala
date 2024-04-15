@@ -2,6 +2,9 @@ package queries
 
 import caliban.client.CalibanClientError
 import caliban.client.Github._
+import org.slf4j.{Logger, LoggerFactory}
+import queries.RepoQuery.getClass
+import queries.util.HttpUtil.sendRequest
 import sttp.capabilities.WebSockets
 import sttp.capabilities.zio.ZioStreams
 import sttp.client3._
@@ -10,6 +13,7 @@ import sttp.model.Header
 import zio._
 
 object CommitQuery extends ZIOAppDefault {
+  val logger: Logger = LoggerFactory.getLogger(getClass)
   def run: ZIO[Any , Throwable, Unit] = {
     val githubGraphqlEndpoint = uri"https://api.github.com/graphql"
     val githubOauthToken: String = "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"
@@ -30,18 +34,7 @@ object CommitQuery extends ZIOAppDefault {
 //              Commit.author(Author.name, Author.email, Author.date)
         ))
 
-    def sendRequest[T](req: Request[Either[CalibanClientError, T], Any]): RIO[SttpBackend[Task, ZioStreams with WebSockets], T] =
-      ZIO
-        .serviceWithZIO[SttpBackend[Task, ZioStreams with WebSockets]] { backend =>
-          req.headers(Header("Authorization", s"Bearer $githubOauthToken")).send(backend)
-        }
-        .mapError { error =>
-          // Print the error message or log it
-          println(s"Error during request: $error")
-          error
-        }
-        .map(_.body)
-        .absolve
+
 
     val call1 = sendRequest(commitsQuery.toRequest(githubGraphqlEndpoint, useVariables = true))
 

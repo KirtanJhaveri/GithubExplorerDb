@@ -1,5 +1,6 @@
 package queries
 
+import caliban.client.AppParameters.{githubGraphqlEndpoint, githubOauthToken, searchFirst, searchLanguage}
 import caliban.client.Operations.RootQuery
 import caliban.client.{CalibanClientError, SelectionBuilder}
 import caliban.client.Github.SearchType.REPOSITORY
@@ -14,6 +15,7 @@ import zio.Console.printLine
 import zio._
 import com.typesafe.config.ConfigFactory
 import caliban.client.TypeAliases.RepoInfoList
+import queries.util.HttpUtil.sendRequest
 
 
 object RepoQuery extends ZIOAppDefault {
@@ -21,12 +23,7 @@ object RepoQuery extends ZIOAppDefault {
 
   def run: ZIO[Any, Throwable, Option[List[Option[Option[Option[RepoInfoList]]]]]] = {
 
-    //Load and read variables from configuration file
-    val config = ConfigFactory.load()
-    val githubGraphqlEndpoint = uri"${config.getString("Github.graphqlEndpoint")}"
-    val githubOauthToken: String = config.getString("Github.oauthToken")
-    val searchLanguage: String = config.getString("Github.search.language")
-    val searchFirst: Int = config.getInt("Github.search.first")
+
 
     //Combining the fields to be sent in the query
     val repository: SelectionBuilder[Repository, RepoInfoList] = Repository.name ~ Repository.ownerInterface(owner = RepositoryOwner.login) ~
@@ -44,17 +41,7 @@ object RepoQuery extends ZIOAppDefault {
             )
         )
 
-    def sendRequest[T](req: Request[Either[CalibanClientError, T], Any]): RIO[SttpBackend[Task, ZioStreams with WebSockets], T] =
-      ZIO
-        .serviceWithZIO[SttpBackend[Task, ZioStreams with WebSockets]] { backend =>
-          req.headers(Header("Authorization", s"Bearer $githubOauthToken")).send(backend)
-        }
-        .mapError { error =>
-          logger.error(s"Error during request: $error")
-          error
-        }
-        .map(_.body)
-        .absolve
+
 
     val call1 = sendRequest(Rquery.toRequest(githubGraphqlEndpoint, useVariables = true))
 

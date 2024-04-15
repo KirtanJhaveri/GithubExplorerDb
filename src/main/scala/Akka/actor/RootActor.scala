@@ -1,9 +1,8 @@
 package Akka.actor
 
-import caliban.client.TypeAliases.RepoInfoList
+import caliban.client.TypeAliases.{IssueInfoList, RepoInfoList}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
-import caliban.client.Github.URI
 import org.slf4j.{Logger, LoggerFactory}
 
 object RootActor {
@@ -13,7 +12,7 @@ object RootActor {
   sealed trait Message
   case class Start(message: String) extends Message
   case class RepoActorReply(reply: Option[List[Option[Option[Option[RepoInfoList]]]]]) extends Message
-  case class IssueFetchActorReply(reply: String) extends Message
+  case class IssueFetchActorReply(reply: Option[Option[List[Option[IssueInfoList]]]]) extends Message
 
   def apply(): Behavior[Message] = Behaviors.setup { context =>
     // Track active issue fetch actors
@@ -31,10 +30,10 @@ object RootActor {
           case (repoName,ownerName, _, isIssuesEnabled, _, _, _, _, uri) if isIssuesEnabled =>
             logger.info(s"Repository Name: $repoName, Issues Enabled: $isIssuesEnabled, URI: $uri")
             val issueActor = context.spawn(IssueFetchActor(), s"IssueActor-$repoName")
-            issueActor ! IssueFetchActor.FetchIssues(repoName, ownerName.toString, context.self)
+            issueActor ! IssueFetchActor.FetchIssues(repoName, ownerName, context.self)
             activeIssueFetches :+ repoName
-          case (name,ownername, _, isIssuesEnabled, _, _, _, _, uri) if !isIssuesEnabled =>
-            logger.info(s"Not $name")  // Ignore if issues are not enabled
+          case (name,ownerName, _, isIssuesEnabled, _, _, _, _, _) if !isIssuesEnabled =>
+            logger.info(s"Issues Not enabled $ownerName/$name")  // Ignore if issues are not enabled
         })
         Behaviors.same  // Continue to receive other messages
 

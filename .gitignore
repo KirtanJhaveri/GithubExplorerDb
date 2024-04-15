@@ -1,0 +1,6 @@
+/.idea/
+/target/
+/project/
+/.bsp/
+/client/.bsp/
+/client/.idea/

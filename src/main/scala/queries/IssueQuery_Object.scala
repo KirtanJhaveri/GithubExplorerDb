@@ -41,6 +41,7 @@ object IssueQuery_Object extends ZIOAppDefault {
     val issuesQuery: SelectionBuilder[Operations.RootQuery, Option[Option[List[Option[IssueInfoList]]]]] =
       Query.repository(owner = ownerName, name = repoName)(
         Repository.issues(first = Some(5))(IssueConnection.nodes(
+          Issue.id~
           Issue.title ~
             Issue.body ~
             Issue.timelineItems(first = Some(5),itemTypes = Some(List(REFERENCED_EVENT)))(IssueTimelineItemsConnection.nodesOption(onReferencedEvent = Some(ReferencedEvent.commit(Commit.oid ~ Commit.message))))

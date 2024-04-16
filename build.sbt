@@ -28,6 +28,7 @@ libraryDependencies += "io.spray" %% "spray-json" % "1.3.6"
 //conf
 libraryDependencies += "com.typesafe" % "config" % "1.4.3"
 
+libraryDependencies += "com.datastax.oss" % "java-driver-core" % "4.13.0"
 
 
 //Caliban

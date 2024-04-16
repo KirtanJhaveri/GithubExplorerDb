@@ -3,6 +3,7 @@ package Akka.actor
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import caliban.client.TypeAliases.IssueInfoList
+import com.datastax.oss.driver.api.core.cql.SimpleStatement
 import org.slf4j.{Logger, LoggerFactory}
 import queries.IssueQuery
 import zio.{Runtime, Unsafe}
@@ -34,10 +35,12 @@ object IssueFetchActor {
           //          logger.info(s" after call $ownerName/$repoName")
           future.onComplete {
             case scala.util.Success(value) =>
-              val issuesFormatted = formatIssues(value)
-              val reply: Option[Option[List[Option[IssueInfoList]]]] = value
-              logger.info(s"Issues successfully fetched for $repoName:\n$issuesFormatted")
+//              val issuesFormatted = formatIssues(value)
+//              val reply: Option[Option[List[Option[IssueInfoList]]]] = value
+              val fin = formatIssues2(repoName,ownerName,value)
+              logger.info(s"Issues successfully fetched for $repoName:\n$fin")
               //              logger.info(s"Issues successfully fetched for $repoName: ${reply.toString}")
+              logger.info("Issue Done")
               replyTo ! RootActor.IssueFetchActorReply(value)
             case scala.util.Failure(exception) =>
               logger.error(s"Failed to fetch issues for $repoName: ${exception.getMessage}")
@@ -47,29 +50,63 @@ object IssueFetchActor {
         Behaviors.same
     }
   }
-  def formatIssues(issues: Option[Option[List[Option[IssueInfoList]]]]): String = {
+
+//
+  private def formatIssues2(repoName:String, ownerName:String, issues: Option[Option[List[Option[IssueInfoList]]]]): String = {
     issues match {
       case Some(Some(issueList)) =>
-        issueList.flatten match {
-          case Nil => "No issues found"
-          case listOfIssues =>
-            listOfIssues.map(formatIssueInfo).mkString("\n\n")
+        if (issueList.flatten.isEmpty) "No issues found"
+        else {
+          val formattedIssues = issueList.flatten.map {
+            case (id,title, body, nestedData) =>
+              val insertStmt = SimpleStatement.builder("INSERT INTO github_data.issues (owner_name, repo_name, issue_id, title, body) VALUES (?, ?, ?, ?, ?)")
+                .addPositionalValues(repoName,ownerName,id,title,body)
+                .build()
+              CassandraClient.session.execute(insertStmt)
+
+              val formattedNestedData = nestedData match {
+                case Some(list) =>
+                  list.flatten.flatten.flatten.map {
+                    case (commitSha, commitMessage) =>
+
+                      val insertStmt = SimpleStatement.builder("INSERT INTO github_data.commits (owner_name, repo_name, issue_id, commit_id, commit_message) VALUES (?, ?, ?, ?, ?)")
+                        .addPositionalValues(repoName,ownerName,id,commitSha,commitMessage)
+                        .build()
+                      CassandraClient.session.execute(insertStmt)
+                      s"Commit SHA: $commitSha, Message: $commitMessage"
+                  }.mkString("\n")
+                case None => "No associated commits"
+              }
+              s"Issue Title: $title\nIssue Body: $body\nAssociated Commits:\n$formattedNestedData"
+          }
+          formattedIssues.mkString("\n\n")
         }
       case _ => "No issues found"
     }
   }
-
-  def formatIssueInfo(issueInfo: IssueInfoList): String = {
-    val (title, body, nestedData) = issueInfo
-    val formattedNestedData = nestedData match {
-      case Some(list) =>
-        list.flatten.flatten.flatten.map {
-          case (commitSha, commitMessage) => s"Commit SHA: $commitSha, Message: $commitMessage"
-        }.mkString("\n")
-      case None => "No associated commits"
-    }
-    s"Issue Title: $title\nIssue Body: $body\nAssociated Commits:\n$formattedNestedData"
-  }
+//  private def formatIssues(issues: Option[Option[List[Option[IssueInfoList]]]]): String = {
+    //    issues match {
+    //      case Some(Some(issueList)) =>
+    //        issueList.flatten match {
+    //          case Nil => "No issues found"
+    //          case listOfIssues =>
+    //            listOfIssues.map(formatIssueInfo).mkString("\n\n")
+    //        }
+    //      case _ => "No issues found"
+    //    }
+    //  }
+    //
+    //  private def formatIssueInfo(issueInfo: IssueInfoList): String = {
+    //    val (id,title, body, nestedData) = issueInfo
+    //    val formattedNestedData = nestedData match {
+    //      case Some(list) =>
+    //        list.flatten.flatten.flatten.map {
+    //          case (commitSha, commitMessage) => s"Commit SHA: $commitSha, Message: $commitMessage"
+    //        }.mkString("\n")
+    //      case None => "No associated commits"
+    //    }
+    //    s"Issue id: $id Issue Title: $title\nIssue Body: $body\nAssociated Commits:\n$formattedNestedData"
+    //  }
 
 
 

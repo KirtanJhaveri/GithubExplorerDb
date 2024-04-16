@@ -28,14 +28,16 @@ object IssueFetchActor {
           val obj = new IssueQuery()
           obj.setRepoName(repoName)
           obj.setOwnerName(ownerName)
-//          logger.info(s" before call $ownerName/$repoName")
-//          logger.info(s" before call from issue query ${obj.ownerName}/${obj.repoName}")
+          //          logger.info(s" before call $ownerName/$repoName")
+          //          logger.info(s" before call from issue query ${obj.ownerName}/${obj.repoName}")
           val future = runtime.unsafe.runToFuture(obj.run)
-//          logger.info(s" after call $ownerName/$repoName")
+          //          logger.info(s" after call $ownerName/$repoName")
           future.onComplete {
             case scala.util.Success(value) =>
+              val issuesFormatted = formatIssues(value)
               val reply: Option[Option[List[Option[IssueInfoList]]]] = value
-              logger.info(s"Issues successfully fetched for $repoName: ${reply.toString}")
+              logger.info(s"Issues successfully fetched for $repoName:\n$issuesFormatted")
+              //              logger.info(s"Issues successfully fetched for $repoName: ${reply.toString}")
               replyTo ! RootActor.IssueFetchActorReply(value)
             case scala.util.Failure(exception) =>
               logger.error(s"Failed to fetch issues for $repoName: ${exception.getMessage}")
@@ -45,11 +47,33 @@ object IssueFetchActor {
         Behaviors.same
     }
   }
+  def formatIssues(issues: Option[Option[List[Option[IssueInfoList]]]]): String = {
+    issues match {
+      case Some(Some(issueList)) =>
+        issueList.flatten match {
+          case Nil => "No issues found"
+          case listOfIssues =>
+            listOfIssues.map(formatIssueInfo).mkString("\n\n")
+        }
+      case _ => "No issues found"
+    }
+  }
+
+  def formatIssueInfo(issueInfo: IssueInfoList): String = {
+    val (title, body, nestedData) = issueInfo
+    val formattedNestedData = nestedData match {
+      case Some(list) =>
+        list.flatten.flatten.flatten.map {
+          case (commitSha, commitMessage) => s"Commit SHA: $commitSha, Message: $commitMessage"
+        }.mkString("\n")
+      case None => "No associated commits"
+    }
+    s"Issue Title: $title\nIssue Body: $body\nAssociated Commits:\n$formattedNestedData"
+  }
+
+
+
 }
-
-
-
-
 //object IssueFetchActor {
 //  sealed trait Command
 //  case class FetchIssues(owner: String, repoName: String, replyTo: ActorRef[RootActor.Message]) extends Command

@@ -1,4 +1,4 @@
-package Akka.actor
+package Akka.actors
 
 import com.datastax.oss.driver.api.core.CqlSession
 import java.net.InetSocketAddress

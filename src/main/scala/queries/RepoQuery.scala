@@ -33,7 +33,7 @@ object RepoQuery extends ZIOAppDefault {
     //Sending the query
     val Rquery: SelectionBuilder[RootQuery, Option[List[Option[Option[Option[RepoInfoList]]]]]] =
       Query.
-        search(first = Some(searchFirst), query = s"language:$searchLanguage", `type` = REPOSITORY)(
+        search(first = Some(searchFirst), query = s"$searchLanguage", `type` = REPOSITORY)(
           SearchResultItemConnection.
             edges(SearchResultItemEdge.
               nodeOption(onRepository = Some(repository)

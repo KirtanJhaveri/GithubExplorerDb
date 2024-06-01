@@ -37,7 +37,9 @@ class IssueQuery extends ZIOAppDefault {
           Issue.id~
           Issue.title ~
             Issue.body ~
-            Issue.timelineItems(first = Some(5),itemTypes = Some(List(REFERENCED_EVENT)))(IssueTimelineItemsConnection.nodesOption(onReferencedEvent = Some(ReferencedEvent.commit(Commit.oid ~ Commit.message))))
+            Issue.timelineItems(first = Some(5),
+              itemTypes = Some(List(REFERENCED_EVENT)))(IssueTimelineItemsConnection.nodesOption(
+              onReferencedEvent = Some(ReferencedEvent.commit(Commit.oid ~ Commit.message))))
         )
       ))
 

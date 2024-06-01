@@ -1,4 +1,4 @@
-package Akka.actor
+package Akka.actors
 
 import caliban.client.TypeAliases.{IssueInfoList, RepoInfoList}
 import akka.actor.typed.Behavior
@@ -42,7 +42,7 @@ object RootActor {
                 isDisabled,
                 isEmpty,
                 primaryLanguage.orNull, // If `primaryLanguage` is an Option[String]
-                uri.strip()
+                uri.trim()
               )
               .build()
             CassandraClient.session.execute(insertStmt)

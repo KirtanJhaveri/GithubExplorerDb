@@ -10,8 +10,17 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.2.17" % Test
+  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
+  "org.mockito" %% "mockito-scala-scalatest" % "1.16.37" % Test
 )
+
+//libraryDependencies ++= Seq(
+//  "dev.zio" %% "zio-test" % "1.0.12" % Test,
+//  "dev.zio" %% "zio-test-sbt" % "2.0.22" % Test,
+//  "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % "3.9.5" % Test,
+//  "com.softwaremill.sttp.client3" %% "httpclient-backend-zio" % "3.5.2" % Test,
+//  "com.softwaremill.sttp.client3" %% "mock-backend" % "3.3.15" % Test
+//)
 
 //Akka
 resolvers += "Akka library repository".at("https://repo.akka.io/maven")
@@ -21,14 +30,15 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
   "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
   "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-"com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion
+  "com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test
 )
 libraryDependencies += "io.spray" %% "spray-json" % "1.3.6"
 
 //conf
 libraryDependencies += "com.typesafe" % "config" % "1.4.3"
 
-libraryDependencies += "com.datastax.oss" % "java-driver-core" % "4.13.0"
+libraryDependencies += "com.datastax.oss" % "java-driver-core" % "4.17.0"
 
 
 //Caliban
@@ -38,7 +48,11 @@ val calibanVersion = "2.5.1"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.2"
 
-
+libraryDependencies ++= Seq(
+  "dev.zio" %% "zio-test"          % "2.1.0-RC3" % Test,
+  "dev.zio" %% "zio-test-sbt"      % "2.1.0-RC3" % Test,
+  "dev.zio" %% "zio-test-magnolia" % "2.1.0-RC3" % Test
+)
 
 libraryDependencies ++= Seq(
   "com.github.ghostdogpr"         %% "caliban"                       % "2.5.3",

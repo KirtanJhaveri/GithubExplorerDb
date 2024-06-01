@@ -1,4 +1,4 @@
-package Akka.actor
+package Akka.actors
 
 import queries.RepoQuery
 import zio._

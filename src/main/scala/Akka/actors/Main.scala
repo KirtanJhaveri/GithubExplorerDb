@@ -1,4 +1,4 @@
-package Akka.actor
+package Akka.actors
 
 import akka.actor.typed.ActorSystem
 

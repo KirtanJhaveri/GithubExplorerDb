@@ -1,4 +1,4 @@
-package Akka.actor
+package Akka.actors
 
 import caliban.client.TypeAliases.RepoInfoList
 import akka.actor.typed.{ActorRef, Behavior}
@@ -23,7 +23,7 @@ object RepoActor {
         logger.info("RepoActor spawned")
         val runtime = Runtime.default
         Unsafe.unsafe { implicit unsafe =>
-          val queryEffect = RepoQuery.run // No reply mapping needed
+          val queryEffect = RepoQuery.run
           val future = runtime.unsafe.runToFuture(queryEffect)
           future.onComplete {
             case scala.util.Success(value) =>

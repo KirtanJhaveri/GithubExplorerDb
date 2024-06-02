@@ -18,6 +18,7 @@ time. This report justifies the technology selection, implementation details, li
 and possible future enhancements of the framework, highlighting its impact on software
 engineering research.
 
+If you're interested in learning more about this project please refer the [report](Kirtan_MS_Project_Report.pdf) in the repository.
 
 ## Project Structure
 

@@ -15,8 +15,8 @@ object AppParameters{
   import com.typesafe.config.ConfigFactory
   //Load and read variables from configuration file
   val config: Config = ConfigFactory.load()
-  val githubGraphqlEndpoint = uri"${config.getString("conf.graphqlEndpoint")}"
-  val githubOauthToken: String = config.getString("conf.oauthToken")
-  val searchLanguage: String = config.getString("conf.search.language")
-  val searchFirst: Int = config.getInt("conf.search.first")
+  val githubGraphqlEndpoint = uri"${config.getString("userConf.graphqlEndpoint")}"
+  val githubOauthToken: String = config.getString("userConf.oauthToken")
+  val searchLanguage: String = config.getString("userConf.search.language")
+  val searchFirst: Int = config.getInt("userConf.search.first")
 }

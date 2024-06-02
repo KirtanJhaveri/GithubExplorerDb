@@ -46,7 +46,7 @@ enablePlugins(CalibanPlugin)
 
 val calibanVersion = "2.5.1"
 
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.2"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.6"
 
 libraryDependencies ++= Seq(
   "dev.zio" %% "zio-test"          % "2.1.0-RC3" % Test,

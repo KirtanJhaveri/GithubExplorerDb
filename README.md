@@ -83,22 +83,17 @@ The project uses a configuration file (`application.conf`) to manage:
 
 ### Dependencies
 
-- **Akka Typed:** For actor-based concurrency.
-- **Caliban:** For GraphQL client functionality.
-- **ZIO:** For managing asynchronous and concurrent operations.
+- **Scala(v2.13.13)**
+- **sbt (v1.9,6)**
+- **Akka Typed(v2.9.2):** For actor-based concurrency.
+- **Caliban(v2.5.1):** For GraphQL client functionality.
+- **ZIO(v2.1.0):** For managing asynchronous and concurrent operations.
 - **sttp:** For HTTP client capabilities.
 - **Cassandra:** For database storage.
 - **Docker(Optional):** To run a Cassandra instance
 
 
 ## Getting Started
-
-### Prerequisites
-
-- Scala
-- sbt (Scala Build Tool)
-- Cassandra (running instance)
-- GitHub OAuth token
 
 ### Setup
 
@@ -110,13 +105,28 @@ The project uses a configuration file (`application.conf`) to manage:
 2. **Configure the application:**
     - Update `application.conf` with your GitHub OAuth token and other parameters.
 
-3. **Start the Cassandra instance and ensure it is running.**
+3. **Start the Cassandra instance and ensure it is running. Installation,table creation and connection steps have been explained in the a [section](Installing and Connecting Cassandra with the application) below**.
 
 4. **Build and run the application using sbt:**
    ```bash
    sbt run
    ```
-### Connecting with Cassandra
+    The application fetches repository and issue data from GitHub based on the specified criteria in the configuration file. It processes the data and stores it in a Cassandra database.
+
+#### Shutdown Hook
+The application includes a shutdown hook to ensure proper resource cleanup:
+
+- Closes the Cassandra session.
+- Terminates the Actor System.
+
+#### Logging
+The application uses `slf4j` for logging. Logs provide information about:
+
+- Actor lifecycle events.
+- Query execution results.
+- Database operations.
+
+## Installing and Connecting Cassandra with the application
 #### _**I containerised cassandra using Docker, I've explained steps below(If you already have a cassandra instance running skip directly to the "creating tables" step)**_
 1. **Pull the Cassandra Docker image:**
 
@@ -189,7 +199,7 @@ The project uses a configuration file (`application.conf`) to manage:
 ### Connecting the Application to Cassandra
 
 Ensure the application is configured to connect to Cassandra. Update the `application.conf` file with the correct connection details:
-Below is configuration I used, customise to match yours. 
+Below is the configuration I used, customise to match yours.
 ```
 cassandra {
   contact-points = ["127.0.0.1"]
@@ -197,21 +207,6 @@ cassandra {
   port = 9042
 } 
 ```
-### Running the Application
-The application fetches repository and issue data from GitHub based on the specified criteria in the configuration file. It processes the data and stores it in a Cassandra database.
-
-#### Shutdown Hook
-The application includes a shutdown hook to ensure proper resource cleanup:
-
-- Closes the Cassandra session.
-- Terminates the Actor System.
-
-#### Logging
-The application uses `slf4j` for logging. Logs provide information about:
-
-- Actor lifecycle events.
-- Query execution results.
-- Database operations.
 
 ## Contributing
 ### Contributions are welcome! Please follow the guidelines:

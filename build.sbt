@@ -10,8 +10,8 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
-  "org.mockito" %% "mockito-scala-scalatest" % "1.16.37" % Test
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+  "org.mockito" %% "mockito-scala-scalatest" % "1.17.31" % Test
 )
 
 //libraryDependencies ++= Seq(
@@ -54,6 +54,13 @@ libraryDependencies ++= Seq(
   "dev.zio" %% "zio-test-magnolia" % "2.1.0-RC3" % Test
 )
 
+libraryDependencies += "com.esri.geometry" % "esri-geometry-api" % "2.2.4"
+libraryDependencies += "org.apache.tinkerpop" % "gremlin-core" % "3.7.0"
+libraryDependencies += "org.apache.tinkerpop" % "tinkergraph-gremlin" % "3.7.2"
+
+
+
+
 libraryDependencies ++= Seq(
   "com.github.ghostdogpr"         %% "caliban"                       % "2.5.3",
   "com.github.ghostdogpr"         %% "caliban-quick"                 % "2.5.3",
@@ -61,7 +68,7 @@ libraryDependencies ++= Seq(
 //  "com.github.ghostdogpr"         %% "caliban-play"                  % "2.5.3",
   "com.github.ghostdogpr"         %% "caliban-akka-http"             % "2.5.3",
   "com.github.ghostdogpr"         %% "caliban-zio-http"              % "2.5.1",
-  "dev.zio"                       %% "zio"                           % "2.0.21",
+  "dev.zio"                       %% "zio"                           % "2.1.0",
   "com.github.ghostdogpr"         %% "caliban-federation"            % "2.5.3",
   "com.github.ghostdogpr"         %% "caliban-tapir"                 % "2.5.3",
   "com.github.ghostdogpr"         %% "caliban-client"                % "2.5.3",

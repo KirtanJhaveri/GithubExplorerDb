@@ -1,8 +1,8 @@
-# Highly Parallel Actor-Based Framework for Extracting a snapshot of Github using GraphQL
+# Highly Parallel Actor-Based Framework for Extracting a snapshot of GitHub using GraphQL
 
 ## Project Overview
 
-Github repositories are of paramount importance in software development. Github
+GitHub repositories are of paramount importance in software development. GitHub
 repositories not only simplify the lifecycle and continuous development process for
 developers but also act as datasets for researchers. These researchers search repositories
 to extract patterns and trends that drive new libraries, frameworks, and improvements
@@ -105,7 +105,7 @@ The project uses a configuration file (`application.conf`) to manage:
 2. **Configure the application:**
     - Update `application.conf` with your GitHub OAuth token and other parameters.
 
-3. **Start the Cassandra instance and ensure it is running. Installation,table creation and connection steps have been explained in the a [section](Installing and Connecting Cassandra with the application) below**.
+3. **Start the Cassandra instance and ensure it is running. Installation,table creation and connection steps have been explained in a [section](Installing%20and%20Connecting%20Cassandra%20with%20the%20application) below**.
 
 4. **Build and run the application using sbt:**
    ```bash

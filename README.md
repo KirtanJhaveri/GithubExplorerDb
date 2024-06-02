@@ -14,15 +14,13 @@ combining Akka's actor modeling for operations and GraphQL's ability to streamli
 responses. This combination of technologies meets the needs of software researchers and
 developers by enabling them to efficiently retrieve data related to their custom
 requirements while being scalable to handle data from multiple repositories at the same
-time. This report justifies the technology selection, implementation details, limitations,
-and possible future enhancements of the framework, highlighting its impact on software
-engineering research.
+time.
 
 If you're interested in learning more about this project please refer the [report](Kirtan_MS_Project_Report.pdf) in the repository.
 
 ## Project Structure
 
-### Main Components
+### Key Components
 
 - **Main Application (`Main` object):**
     - Initializes the Actor System.
@@ -45,35 +43,18 @@ If you're interested in learning more about this project please refer the [repor
     - Replies to `RootActor` upon completion.
 
 - **Queries (`RepoQuery` and `IssueQuery` objects):**
-    - Define and execute GraphQL queries to fetch repository and issue data from GitHub.
+  - **RepoQuery:**
+    - Defines a GraphQL query to fetch repository information based on specified criteria.
+    - Uses ZIO effects to handle asynchronous operations.
+
+  - **IssueQuery:**
+    - Defines a GraphQL query to fetch issues for a specific repository.
+    - Uses ZIO effects to handle asynchronous operations.
 
 - **Utilities:**
     - **CassandraClient:** Manages Cassandra session and database operations.
     - **HttpUtil:** Utility to send HTTP requests using sttp client.
 
-### Key Classes and Objects
-
-- **RootActor:**
-    - `Message`: Sealed trait representing messages handled by the Root Actor.
-    - `Start`: Case class to initiate the process.
-    - `RepoActorReply`: Case class to handle repository actor replies.
-    - `IssueFetchActorReply`: Case class to handle issue fetch actor replies.
-
-- **RepoActor:**
-    - `Message`: Sealed trait representing messages handled by the Repo Actor.
-    - `MessageReceived`: Case class to process received messages.
-
-- **IssueFetchActor:**
-    - `Command`: Sealed trait representing commands handled by the Issue Fetch Actor.
-    - `FetchIssues`: Case class to initiate issue fetching.
-
-- **RepoQuery:**
-    - Defines a GraphQL query to fetch repository information based on specified criteria.
-    - Uses ZIO effects to handle asynchronous operations.
-
-- **IssueQuery:**
-    - Defines a GraphQL query to fetch issues for a specific repository.
-    - Uses ZIO effects to handle asynchronous operations.
 
 ### Configuration
 
